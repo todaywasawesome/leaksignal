@@ -1,0 +1,11 @@
+[build]
+target = "wasm32-unknown-unknown"
+
+[profile.release]
+panic = 'abort'
+lto = true
+# debug = true
+# debug-assertions = true
+
+[profile.debug]
+panic = 'abort'

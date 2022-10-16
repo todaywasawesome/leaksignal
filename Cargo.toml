@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "leakpolicy",
+    "leaksignal",
+]
+resolver = "2"

@@ -1,0 +1,29 @@
+version: '3.7'
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile-proxy
+    volumes:
+      - ./config:/config
+    environment:
+    - ENVOY_YAML=${ENVOY_YAML}
+    depends_on:
+    - web_service
+    # networks:
+    # - envoymesh
+    # ports:
+    # - "8000:8000"
+    # - "8001:8001"
+    network_mode: host
+  web_service:
+    build:
+      context: .
+      dockerfile: Dockerfile-web-service
+    volumes:
+      - ./pub:/pub
+    network_mode: host
+    # networks:
+    # - envoymesh
+# networks:
+#   envoymesh: {}

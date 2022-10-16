@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package leaksignal;
+
+message Header {
+    string name = 1;
+    optional string value = 2;
+}
+
+enum Action {
+    NONE = 0;
+    ALERT = 1;
+    MASK = 2;
+    BLOCK = 3;
+}
+
+message Match {
+    string category_name = 1;
+    optional uint64 global_start_position = 2;
+    optional uint64 global_length = 3;
+    string matcher_path = 4;
+    optional string matched_value = 5;
+    Action action_taken = 6;
+    reserved 7;
+}
+
+message MatchDataRequest {
+    optional string api_key = 1;
+    string deployment_name = 2;
+    string policy_id = 3;
+    Action highest_action_taken = 4;
+    uint64 time_request_start = 5;
+    uint64 time_response_start = 6;
+    uint64 time_response_body_start = 7;
+    uint64 time_response_body_end = 8;
+    uint64 time_response_parse_end = 9;
+    repeated Header request_headers = 10;
+    repeated Header response_headers = 11;
+    repeated Match matches = 12;
+    uint64 body_size = 13;
+    optional bytes body = 14;
+    string policy_path = 15;
+    string commit = 16;
+    string token = 17;
+    string ip = 18;
+}
+
+message MatchDataResponse {
+}
+
+message UpdatePolicyRequest {
+    optional string api_key = 1;
+    string deployment_name = 2;
+    string commit = 3;
+}
+
+message UpdatePolicyResponse {
+    string policy_id = 1;
+    string policy = 2;
+}
+
+message HealthCheckMsg {
+
+}
+
+message PingMessage {
+    uint64 timestamp = 1;
+}
+
+service Leaksignal {
+    rpc MatchData(MatchDataRequest) returns (MatchDataResponse) {}
+    // we have to bidirectionally stream for proxy-wasm :(
+    rpc UpdatePolicy(stream UpdatePolicyRequest) returns (stream UpdatePolicyResponse) {}
+    rpc HealthCheck(HealthCheckMsg) returns (HealthCheckMsg) {}
+    rpc Ping(PingMessage) returns (PingMessage) {}
+}

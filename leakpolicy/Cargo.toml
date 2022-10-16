@@ -1,0 +1,15 @@
+[package]
+name = "leakpolicy"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0", features = ["derive", "rc"] }
+serde_yaml = "0.8"
+fancy-regex = "0.10"
+indexmap = { version = "1.9", features = ["serde", "std"] }
+anyhow = "1.0"
+log = "0.4"
+serde_single_or_vec2 = "1.0"

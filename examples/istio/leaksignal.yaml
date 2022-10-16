@@ -1,0 +1,125 @@
+# requires istioctl install --set meshConfig.defaultConfig.proxyMetadata.BOOTSTRAP_XDS_AGENT=\"true\"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: leaksignal
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: EXTENSION_CONFIG
+    match:
+      context: ANY
+    patch:
+      operation: ADD
+      value:
+        name: leaksignal-proxy
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+          config:
+            name: "leaksignal"
+            root_id: "leaksignal"
+            vm_config:
+              runtime: "envoy.wasm.runtime.v8"
+              vm_id: "leaksignal_proxy"
+              code:
+                remote:
+                  http_uri:
+                    uri: https://ingestion.app.leaksignal.com/s3/leakproxy/2022_10_16_16_18_40_fda6eb2/leakproxy.wasm
+                    timeout: 10s
+                    cluster: leaksignal_infra
+                  sha256: 209dc506b952de611e22c9756678aa773492aa0b59a9dc4df197b8cc206fdeed
+                  retry_policy:
+                    num_retries: 10
+  - applyTo: HTTP_FILTER
+    match:
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.http_connection_manager
+            subFilter:
+              name: envoy.filters.http.router
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: leaksignal-proxy
+        config_discovery:
+          config_source:
+            ads: {}
+          type_urls: ["type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm"]
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: leaksignal-service
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: BOOTSTRAP
+    patch:
+      operation: MERGE
+      value:
+        bootstrap_extensions:
+        - name: envoy.bootstrap.wasm
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.wasm.v3.WasmService
+            singleton: true
+            config:
+              name: "leaksignal_service"
+              configuration:
+                "@type": type.googleapis.com/google.protobuf.StringValue
+                value: |
+                  upstream_cluster: leaksignal_infra
+                  api_key: $API_KEY
+                  deployment_name: $DEPLOYMENT_NAME
+              vm_config:
+                runtime: "envoy.wasm.runtime.v8"
+                vm_id: "leaksignal_service"
+                code:
+                  remote:
+                    http_uri:
+                      uri: https://ingestion.app.leaksignal.com/s3/leakproxy/2022_10_16_16_18_40_fda6eb2/leakproxy.wasm
+                      timeout: 10s
+                      cluster: leaksignal_infra
+                    sha256: 209dc506b952de611e22c9756678aa773492aa0b59a9dc4df197b8cc206fdeed
+                    retry_policy:
+                      num_retries: 10
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: leaksignal-upstream
+  namespace: istio-system
+spec:
+  configPatches:
+  - applyTo: CLUSTER
+    patch:
+      operation: ADD
+      value:
+        name: leaksignal_infra
+        type: STRICT_DNS
+        http2_protocol_options: {}
+        dns_lookup_family: V4_PREFERRED
+        lb_policy: ROUND_ROBIN
+        load_assignment:
+          cluster_name: leaksignal_infra0
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: ingestion.app.leaksignal.com
+                    port_value: 443
+        transport_socket:
+          name: envoy.transport_sockets.tls
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+            sni: ingestion.app.leaksignal.com
+            common_tls_context:
+              validation_context:
+                match_typed_subject_alt_names:
+                - san_type: DNS
+                  matcher:
+                    exact: ingestion.app.leaksignal.com
+                trusted_ca:
+                  filename: /etc/ssl/certs/ca-certificates.crt
