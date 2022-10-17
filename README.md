@@ -5,10 +5,7 @@
 
 <h4 align="center">
   <a href="https://www.leaksignal.com">Website</a> |
-  <a href="https://blog.leaksignal.com">Blog</a> |
-  <a href="https://docs.leaksignal.com">Documentation</a> |
-  <a href="https://docs.leaksignal.com/faq/">FAQ</a> |
-  <a href="https://slack.leaksignal.com">Slack</a>
+  <a href="https://blog.leaksignal.com">Blog</a>
 </h4>
 
 <p align="center">
@@ -173,7 +170,8 @@ In all cases you should see messsages with "leaksignal" in the logs. Use those t
 ### View Metrics (Prometheus)
 Next we'll check Prometheus to ensure LeakSignal metrics are ingested. (If you don't have or want to use Prometheus skip to the next step)
 Here's an example from the demo in where grafana displays LeakSignal metrics from prometheus:
-![](/assets/sd_per_min.png)
+<img src="assets/sd_per_min.png"><img src="assets/active_exploits.png">
+
 
 ### View Metrics (COMMAND)
 Once you login to LeakSignal COMMAND, you'll see the Sensitive Data Overview as the default screen:
