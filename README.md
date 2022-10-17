@@ -104,7 +104,7 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 ```
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
-> * [View prometheus metrics in grafana](#view-metrics-prometheus)
+> * [View prometheus metrics in grafana](#view-metrics-prometheus-grafana)
 
 Use the [demo environment](https://github.com/leaksignal/testing-environments) to see a working example. Your sensitive data labels and counts will be exported as Envoy metrics. 
 
@@ -167,10 +167,13 @@ kubectl -n istio-system logs istio-ingressgateway-abc123
 In all cases you should see messsages with "leaksignal" in the logs. Use those to understand if things are setup correctly. Note that you may see messages like `createWasm: failed to load (in progress) from https://ingestion.app...` if loading the wasm file remotely. This is a known issue and the wasm filter is functioning properly.  
 
 
-### View Metrics (Prometheus)
-Next we'll check Prometheus to ensure LeakSignal metrics are ingested. (If you don't have or want to use Prometheus skip to the next step)
-Here's an example from the demo in where grafana displays LeakSignal metrics from prometheus:
-<img src="assets/sd_per_min.png"><img src="assets/active_exploits.png">
+### View Metrics (Prometheus & Grafana)
+Prometheus is capable of ingesting LeakSignal metrics. You can configure your policy to alert on specific data types to detect spikes in emission of data or edge cases like the signature of a known RCE. (If you don't have or want to use Prometheus skip to the next step)
+
+Here's an example from [Microservices Goat](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
+
+<img src="assets/sd_per_min.png" width="300">
+<img src="assets/active_exploits.png" width="350">
 
 
 ### View Metrics (COMMAND)
@@ -186,8 +189,6 @@ Once you login to LeakSignal COMMAND, you'll see the Sensitive Data Overview as 
 After you've verified that the filter is running, you can configure the policy to check for specific sensitive data types or patterns. For examples of preconfigured and performance tested policies, see [LeakSignal Policies](#policies)
 
 All regex is standard PCRE.
-
-@max do we have a yaml schema? (seems like there's one specific for command and one for local e.g. alerts)
 
 - Match rules - how to write ( nd optimize)
 - Creating Alerts
