@@ -8,11 +8,13 @@ pub mod html;
 // pub mod jpeg;
 pub mod json;
 
+#[allow(dead_code)]
 pub enum ParseResponse {
     Continue,
     Block,
 }
 
+#[allow(dead_code)]
 fn replace_matches<'a>(
     body: &'a str,
     matches: &[CategoryMatch],

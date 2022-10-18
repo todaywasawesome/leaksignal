@@ -90,8 +90,8 @@ fn prepare_match_group<'a>(
             ignore: smallvec::smallvec![extra_ignore, ignore],
         });
     }
-    for direct in direct {
-        todo!("direct matching impl")
+    for _ in direct {
+        todo!("direct matching implementation")
     }
 }
 

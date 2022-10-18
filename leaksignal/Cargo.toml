@@ -2,6 +2,13 @@
 name = "leaksignal"
 version = "0.1.0"
 edition = "2021"
+authors = ["Protryon <max.bruce12@gmail.com>"]
+license = "Apache-2.0"
+repository = "https://github.com/leaksignal/leaksignal"
+description = "Leaksignal Proxy-Wasm Filter"
+keywords = [ "leaksignal", "proxy", "wasm", "filter", "security" ]
+readme = "../README.md"
+homepage = "https://www.leaksignal.com/"
 
 [[bench]]
 name = "regex_bench"

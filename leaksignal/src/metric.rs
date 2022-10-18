@@ -27,6 +27,7 @@ impl Metric {
         Metric(metric_id)
     }
 
+    #[allow(dead_code)]
     pub fn set_value(&self, value: u64) {
         hostcalls::record_metric(self.0, value).expect("failed to record_metric");
     }
