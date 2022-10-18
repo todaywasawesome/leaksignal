@@ -13,14 +13,14 @@ There are two primary sections of LS policies, `categories` of matchers and `end
 Categories map a human concept of sensitive data to concrete ways to match that data. Regexes, literal strings, regexes near other regexes, etc, are all examples of this.
 
 #### Matcher Category
-A matcher category matches on data on a response body. They can be regexes, raw values, exceptions (the `ignore` section), or accelerated native matchers. All individual matching strategies are considered individually, and a match by any matching strategy constitutes a match of the category.
+Matchers are data patterns that are searched in a response body. They can be regexes, raw values, exceptions (the `ignore` section), or accelerated native matchers. All individual matching strategies are considered individually, and a match by any matching strategy constitutes a match of the category.
 
 
 ##### Writing regexes
 
-The `fancy_regex` Rust crate has poor performance when used with `lookaround`, i.e. `lookahead` or `lookbehind` regex features. It's advised to instead capture the area around the interesting sensitive data, then strip it out via the `regex_strip` field shown below.
+Regex implementations (including the one we use, the `fancy_regex` Rust crate) have poor performance when used with _lookaround_ (_lookahead_ or _lookbehind_) regex features. It's advised to instead capture the area around the interesting sensitive data, then strip it out via the `regex_strip` field shown below.
 
-Since the policies are written in YAML, the any backslashes in a regex must be escaped. I.e. `\d` would be invalid, where `\\d` would match a digit group as expected. It may be cleaner/more readable to prefer manually specifying groups where possible. I.e. `[0-9]` as opposed to `\\d`.
+Since the policies are written in YAML, any backslash in a regex must be escaped (`\d` is invalid, where `\\d` matches a digit group as expected). In some cases, it may be more readable to specify character ranges (`[0-9]` as opposed to `\\d`).
 
 ##### Email regex with an ignored email
 This example matches emails, but ignores the specific email `someone@example.com`
@@ -36,7 +36,7 @@ categories:
 ```
 
 ##### Suspicious strings
-This example matches some suspicious string literals. These are usually used on JSON or other semistructured data formats. In practice, they might be broken out into multiple rules for more detailed reporting.
+This example matches some suspicious string literals. These are usually used in JSON property names, or other structured data formats.
 
 ```
 categories:
@@ -45,6 +45,21 @@ categories:
       raw:
         - credit_card
         - social_security_number
+        - password_hash
+```
+
+In practice, they might be broken down into multiple rules for more detailed reporting. For instance, the previous example can be rewritten as follows.
+
+```
+categories:
+  personal_information:
+    Matchers:
+      raw:
+        - credit_card
+        - social_security_number
+  security_data:
+    Matchers:
+      raw:
         - password_hash
 ```
 
@@ -60,7 +75,7 @@ categories:
 ```
 
 #### Correlate Category
-A correlate category composes two other categories (generally matcher category), and only signals a match if the two match within a certain distance of one another.
+A Correlate category composes two other categories (generally Matcher category), and only signals a match if the two match within a certain distance of one another.
 
 ##### Unformatted phone numbers near "phone"
 This example matches 10 digit unformatted phone numbers within 64 bytes of the "phone" string. The `interest` field denotes which of the two groups should be reported as interesting, or if omitted, both groups **and all characters inbetween** are considered as matched.
@@ -89,7 +104,7 @@ categories:
       regex_strip: 1
       regexes:
         - "[^0-9][0-9]{10}[^0-9]"
-  phone_number_correlate:
+  phone_number_near_label:
     Correlate:
       group1: phone_number
       group2:
@@ -100,7 +115,7 @@ categories:
 ```
 
 #### Rematch Category
-A rematch category composes two other categories (generally matcher category). It matches the first category, then the second category in sequence. This can be used to improve performance with complex regex.
+A Rematch category composes two other categories (generally Matcher category). It matches the first category, then the second category in sequence. This can be used to improve performance as an alternative to a complex regex.
 
 It is currently disabled, but support will be re-enabled in the future.
 
@@ -130,7 +145,7 @@ Path globs are similar to a host-prefixed HTTP path.
 
 ##### Components
 
-A path glob is made up of forward-slash-separated components, with no trailing or leading slash. The first component is protocol specific, in HTTP/gRPC it's the `:authority` or `Host` header. The rest of the components are the HTTP path, not including the query string.
+A path glob is made up of forward-slash-separated components, with no trailing or leading slash. The first component is protocol specific: in HTTP/gRPC it's the `:authority` or `Host` header. The rest of the components are the HTTP path, not including the query string.
 
 Each component can be one of the following:
 * `*`: Matches any single component.
@@ -146,16 +161,21 @@ Each component can be one of the following:
 ```
 # matches any path
 **
+
 # matches the path /foo on any hostname
 */foo
+
 # matches any path on the 'example.com' hostname
 example.com/**
+
 # matches a parameter component
 # i.e. example.com/product/123 OR example.com/product/ABC
 example.com/product/*
+
 # matches a regex limited component
 # i.e. example.com/product/123 BUT NOT example.com/product/ABC
 example.com/product/#[0-9]+
+
 # matches any path ending in '.php'
 # the last component must end with '.php', but the rest of the components are ignored
 **/*.php
@@ -163,7 +183,7 @@ example.com/product/#[0-9]+
 
 #### Endpoint Configuration
 
-An individual endpoint block is composed of one or more of path globs for matching paths and a configuration set for different matching rules.
+An individual endpoint block is composed of one or more of path globs for matching paths, followed by a configuration set for the different matching rules, and two optional configuration sets for token extraction and data reporting style.
 
 ##### Schema of EndpointConfig
 
