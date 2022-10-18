@@ -1,5 +1,5 @@
 <a href="https://www.leaksignal.com"><p align="center">
-  <img src="assets/logo-black-red.png" width="800">
+  <img src="assets/logo-black-red.png?sanitize=true" width="800">
 </p></a>
 
 <h4 align="center">
@@ -12,14 +12,14 @@
   <a href="https://github.com/leaksignal/leaksignal/blob/master/LICENSE"><img src="https://img.shields.io/hexpm/l/plug" alt="License"></a>
 </p>
 
-<p align="center">🔍 There’s all kinds of sensitive data flowing through my services, but I don’t know which ones or what data. 🤷</p>
+<p align="center">🔍 There are all kinds of sensitive data flowing through my services, but I don’t know which ones or what data. 🤷</p>
 
-LeakSignal provides observability by generating metrics (or [statistics](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/observability/statistics#arch-overview-statistics)) for sensitive data that is contained in request/response content. LeakSignal metrics can be consumed by Prometheus, pushed as OpenTelemetry, or collected in a centralized dashboard.
+LeakSignal provides observability by generating metrics (or [statistics](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/observability/statistics#arch-overview-statistics)) for sensitive data contained in request/response content. LeakSignal metrics can be consumed by Prometheus, pushed as OpenTelemetry, or collected in a centralized dashboard.
 
 ### Features
 * Fast, inline Layer 7 request/response analysis.
 * Easy to configure rules ("L7 policy") for detecting and analyzing sensitive data (e.g. PII) leakage.
-  * Detect part numbers, account numbers, patient info, grades, dates, email addresses, large arrays, etc. The available ruleset is constantly evolving.
+  * Detect part numbers, account numbers, patient info, grades, dates, email addresses, large arrays, etc. You can write your own or use our constantly evolving <a href="somewhere">ruleset</a> library (contributions welcome).
 * Cloud dashboard with policy editor, monitoring, and alerting.
 * Analysis metrics can be exposed via Envoy and thus reflected wherever Envoy metrics are configured to land (OpenTelemetry, Prometheus, etc.)
 
@@ -59,7 +59,7 @@ Built with Rust and deployed as WebAssembly, LeakSignal natively runs on proxies
 LeakSignal analysis can be setup in the following modes:
 * All metrics and configuration stay local in your environment
 * All metrics and configuration go to LeakSignal COMMAND.
-  * Sensitive data is sent to COMMAND by default.
+  * Sensitive data are sent to COMMAND by default.
   * Specific endpoints, match rules, or the entire policy can opt-in to send raw sensitive data, low-bit subsets of SHA-256 hashes for low-entropy data (i.e. credit cards, phone numbers), or no representation of the matched data at all.
 
 ## Getting Started with a Demo
@@ -73,7 +73,10 @@ If you're looking to kick the tires with a demo setup, you have 2 options:
 ## Getting Started with Existing Setup 
 If you already have an environment up and running (Standalone Envoy, K8s, or Istio) where you'd like to install LeakSignal, use the following quick starts.
 
-### Envoy Quickstart
+### Quickstarts
+<details>
+  <summary>Envoy Quickstart</summary>
+
 Docker commands to run an Envoy proxy with LeakSignal installed. 
 
 1. [Register for an account](https://app.leaksignal.com/register)
@@ -90,9 +93,11 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 ```
 > * Go to Deployments -> YOUR-DEPLOYMENT-NAME and learn more about the L7 Policy that is currently running.
 > * [View metrics in COMMAND](#view-metrics-command)
+</details>
 
+<details>
+  <summary>Envoy-Local Quickstart (no cloud connection)</summary>
 
-### Envoy-Local Quickstart (no cloud connection)
 Docker commands to run an Envoy proxy with LeakSignal installed. 
 * This configuration runs LeakSignal in "local" mode where metrics are only exported in the running Envoy instance. 
 * The LeakSignal L7 Policy is contained in the Envoy yaml configuration. 
@@ -101,7 +106,7 @@ Docker commands to run an Envoy proxy with LeakSignal installed.
 ```
 FROM envoyproxy/envoy-dev:0b1c5aca39b8c2320501ce4b94fe34f2ad5808aa
 RUN curl -O https://raw.githubusercontent.com/leaksignal/leaksignal/master/examples/envoy/envoy_local.yaml > /etc/envoy.yaml
-RUN curl -O https://ingestion.app.leaksignal.com/s3/leakproxy/2022_10_18_20_53_00_7bbcb80/leaksignal.wasm > /lib/leaksignal.wasm
+RUN curl -O https://ingestion.app.leaksignal.com/s3/leakproxy/2022_10_16_16_18_40_fda6eb2/leakproxy.wasm > /lib/leaksignal.wasm
 RUN chmod go+r /etc/envoy.yaml
 CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 ```
@@ -111,9 +116,11 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 > * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
 
 Use the [test environment](https://github.com/leaksignal/testing-environments) to see a working example. Your sensitive data labels and counts will be exported as Envoy metrics. 
+</details>
 
+<details>
+  <summary>Istio</summary>
 
-### Istio
 Install LeakSignal across all Istio sidecar proxies with the following:
 
 1. [Register for an account](https://app.leaksignal.com/register)
@@ -136,8 +143,11 @@ kubectl apply -f -
 kubectl delete --all pod
 ```
 > Go to Deployments -> YOUR-DEPLOYMENT-NAME and learn more about the L7 Policy that is currently running.
+</details>
 
-### Istio-Local (no cloud metrics)
+<details>
+  <summary>Istio-Local (no cloud metrics)</summary>
+
 Install LeakSignal across all Istio sidecar proxies with the following. 
 * This configuration runs LeakSignal in "local" mode where metrics are only exported in the running Envoy instance. 
 * The LeakSignal L7 Policy is contained in the Envoy yaml configuration. 
@@ -158,6 +168,7 @@ kubectl delete --all pod
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
 > * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
+</details>
 
 ### Verify Proper Setup
 After you've installed the LeakSignal filter, you can check the logs to see how things are running:
@@ -177,11 +188,11 @@ For Istio run:
 kubectl -n istio-system get pods
 kubectl -n istio-system logs istio-ingressgateway-abc123
 ```
-In all cases you should see messsages with "leaksignal" in the logs. Use those to understand if things are setup correctly. Note that you may see messages like `createWasm: failed to load (in progress) from https://ingestion.app...` if loading the wasm file remotely. This is a known issue and the wasm filter is functioning properly.  
+In all cases you should see messsages with "leaksignal" in the logs. Use those to understand if things are setup correctly. Note that you may see messages like `create Wasm: failed to load (in progress) from https://ingestion.app...` if loading the wasm file remotely. This is a known issue and the wasm filter is functioning properly.  
 
 
 ### View Metrics (Prometheus & Grafana)
-Prometheus is capable of ingesting LeakSignal metrics. You can configure your policy to alert on specific data types to detect spikes in emission of data or edge cases like the signature of a known RCE. (If you don't have or want to use Prometheus skip to the next step)
+Prometheus is capable of ingesting LeakSignal metrics. You can configure your policy to alert on specific data types to detect spikes in emission of data or edge cases like the signature of a known RCE. (If you don't have or want to use Prometheus skip to the next step).
 
 Here's an example from our [k8s test environment](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
 
