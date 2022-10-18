@@ -66,8 +66,9 @@ LeakSignal analysis can be setup in the following modes:
 
 If you're looking to kick the tires with a demo setup, you have 2 options:
 1. [Simple Envoy Ingress controller for K8s cluster](https://github.com/leaksignal/testing-environments).
+    * LeakSignal is preinstalled with policy and test applications/services. 
 2. [Google's Online Boutique microservices demo for Istio](https://github.com/leaksignal/testing-environments/istio).
-
+    * Follow along with the Istio install and then add LeaskSignal.
   
 ## Getting Started with Existing Setup 
 If you already have an environment up and running (Standalone Envoy, K8s, or Istio) where you'd like to install LeakSignal, use the following quick starts.
@@ -92,7 +93,10 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 
 
 ### Envoy-Local Quickstart (no cloud connection)
-Docker commands to run an Envoy proxy with LeakSignal installed. This configuration runs LeakSignal in "local" mode where metrics are only exported in the running Envoy instance. Additionally, the LeakSignal L7 Policy is contained in the yaml configuration. LeakSignal API Key and deployment name are not needed.
+Docker commands to run an Envoy proxy with LeakSignal installed. 
+* This configuration runs LeakSignal in "local" mode where metrics are only exported in the running Envoy instance. 
+* The LeakSignal L7 Policy is contained in the Envoy yaml configuration. 
+* LeakSignal API Key and deployment name are not needed.
 
 ```
 FROM envoyproxy/envoy-dev:0b1c5aca39b8c2320501ce4b94fe34f2ad5808aa
@@ -104,7 +108,7 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
-> * [View prometheus metrics in grafana](#view-metrics-prometheus-grafana)
+> * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
 
 Use the [demo environment](https://github.com/leaksignal/testing-environments) to see a working example. Your sensitive data labels and counts will be exported as Envoy metrics. 
 
@@ -134,7 +138,10 @@ kubectl delete --all pod
 > Go to Deployments -> YOUR-DEPLOYMENT-NAME and learn more about the L7 Policy that is currently running.
 
 ### Istio-Local (no cloud metrics)
-Install LeakSignal across all Istio sidecar proxies with the following. Metrics will be exported in Envoy and L7 Policy is contained in the yaml configuration. LeakSignal API Key and deployment name are not needed.
+Install LeakSignal across all Istio sidecar proxies with the following. 
+* This configuration runs LeakSignal in "local" mode where metrics are only exported in the running Envoy instance. 
+* The LeakSignal L7 Policy is contained in the Envoy yaml configuration. 
+* LeakSignal API Key and deployment name are not needed.
 
 A connection to the cloud is still necessary to pull the WASM proxy, but no metrics or sensitive data are uploaded.
 
@@ -150,6 +157,7 @@ kubectl delete --all pod
 ```
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
+> * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
 
 ### Verify Proper Setup
 After you've installed the LeakSignal filter, you can check the logs to see how things are running:
@@ -175,11 +183,11 @@ In all cases you should see messsages with "leaksignal" in the logs. Use those t
 ### View Metrics (Prometheus & Grafana)
 Prometheus is capable of ingesting LeakSignal metrics. You can configure your policy to alert on specific data types to detect spikes in emission of data or edge cases like the signature of a known RCE. (If you don't have or want to use Prometheus skip to the next step)
 
-Here's an example from a [k8s test environment](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
+Here's an example from our [k8s test environment](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
 
-LeakSignal defines 2 new metrics for DevSecOps teams:
-1. Sensitive Data per Minute
-2. Exploits per Minute
+LeakSignal defines 2 new metrics in Grafana:
+1. Sensitive Data per Minute (SDPM)
+2. Exploits per Minute (EPM)
 
 <img src="assets/grafana-overview.png">
 
@@ -187,32 +195,31 @@ LeakSignal defines 2 new metrics for DevSecOps teams:
 ### View Metrics (COMMAND)
 Once you login to LeakSignal COMMAND, you'll see the Sensitive Data Overview as the default screen:
 <img src="assets/dashboard.png" width="550">
-- Overview - 
-- Drilling down on data
-- Performance metrics
-- Visualizing a leak
 
+Docs for data drill down and detecting leaks coming soon.
 
 ### Test and configure L7 Policy
-After you've verified that the filter is running, you can configure the policy to check for specific sensitive data types or patterns. For examples of preconfigured and performance tested policies, see [LeakSignal Policies](#policies)
-
-All regex is standard PCRE.
-
-- Match rules - how to write ( nd optimize)
-- Creating Alerts
-- Sensitive Data Access Limits
-
-## Troubleshooting
-- Viewing logs across services
+After you've verified that the filter is running, you can configure the policy to check for specific sensitive data types or patterns. For examples of preconfigured and performance tested policies, see [LeakSignal Policies](POLICY.md)
 
 ## Community / How to Contribute
-- Slack Public - Regex Channel, Policy Channel, K8s
-- Code contribution guidelines
+* Code contribution guidelines (Coming soon)
 
 ## Commercial support
 - Leaksignal, Inc offers support and self-hosted versions of the cloud dashboard. Contact sales@leaksignal.com.
 
 ## License 
-- Apache2 
+Copyright 2022 LeakSignal, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 

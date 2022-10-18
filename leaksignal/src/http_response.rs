@@ -9,7 +9,6 @@ use std::{
 };
 
 use anyhow::{bail, Result};
-use fancy_regex::Regex;
 use flate2::write::GzDecoder;
 use futures::{task::waker, Future, FutureExt};
 use leakpolicy::RegexWrapper;
@@ -353,7 +352,7 @@ impl HttpContext for HttpResponseContext {
                         header,
                         regex,
                     }) if &name == header => {
-                        data.token = extract_token_regex(&*value, &regex.0);
+                        data.token = extract_token_regex(&*value, regex.as_ref());
                     }
                     Some(TokenExtractionConfig {
                         location: TokenExtractionSite::RequestCookie,
@@ -366,7 +365,7 @@ impl HttpContext for HttpResponseContext {
                                 None => continue,
                             };
                             if name == header {
-                                data.token = extract_token_regex(value, &regex.0);
+                                data.token = extract_token_regex(value, regex.as_ref());
                                 break;
                             }
                         }
@@ -413,7 +412,7 @@ impl HttpContext for HttpResponseContext {
                             header,
                             regex,
                         }) if &name == header => {
-                            data.token = extract_token_regex(&*value, &regex.0);
+                            data.token = extract_token_regex(&*value, regex.as_ref());
                         }
                         _ => (),
                     }
