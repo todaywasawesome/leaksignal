@@ -188,7 +188,7 @@ For Istio run:
 kubectl -n istio-system get pods
 kubectl -n istio-system logs istio-ingressgateway-abc123
 ```
-In all cases you should see messsages with "leaksignal" in the logs. Use those to understand if things are setup correctly. Note that you may see messages like `create Wasm: failed to load (in progress) from https://ingestion.app...` if loading the wasm file remotely. This is a known issue and the wasm filter is functioning properly.  
+In all cases you should see messsages with "leaksignal" in the logs. Use those to understand if things are setup correctly. Note that you may see messages like `createWasm: failed to load (in progress) from https://ingestion.app...` if loading the wasm file remotely. This is a known issue and the wasm filter is functioning properly.  
 
 
 ### View Metrics (Prometheus & Grafana)
