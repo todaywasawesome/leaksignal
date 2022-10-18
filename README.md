@@ -110,7 +110,7 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 > * Test and configure L7 Policy for your environment
 > * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
 
-Use the [demo environment](https://github.com/leaksignal/testing-environments) to see a working example. Your sensitive data labels and counts will be exported as Envoy metrics. 
+Use the [test environment](https://github.com/leaksignal/testing-environments) to see a working example. Your sensitive data labels and counts will be exported as Envoy metrics. 
 
 
 ### Istio
@@ -194,9 +194,16 @@ LeakSignal defines 2 new metrics in Grafana:
 
 ### View Metrics (COMMAND)
 Once you login to LeakSignal COMMAND, you'll see the Sensitive Data Overview as the default screen:
-<img src="assets/dashboard.png" width="550">
 
-Docs for data drill down and detecting leaks coming soon.
+The following example data is from our k8s [test environment](https://github.com/leaksignal/testing-environments).
+<img src="assets/sd_detail.png" width="750">
+
+Scroll down to the data grid and click on a response ID to examine the alerts that were generated.
+<img src="assets/alert_w_page.png" width="750">
+
+
+
+More docs coming soon coming soon.
 
 ### Test and configure L7 Policy
 After you've verified that the filter is running, you can configure the policy to check for specific sensitive data types or patterns. For examples of preconfigured and performance tested policies, see [LeakSignal Policies](POLICY.md)
