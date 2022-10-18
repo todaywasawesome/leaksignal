@@ -201,9 +201,10 @@ The following example data is from our k8s [test environment](https://github.com
 Scroll down to the data grid and click on a response ID to examine the alerts that were generated.
 <img src="assets/alerts_w_page.png" width="750">
 
+Click Heat Map in the left hand nav for a complete view of how sensitive data is accessed by IP addresses and/or authentication tokens
+<img src="assets/heatmap.png" width="750">
 
-
-More docs coming soon coming soon.
+More docs coming soon!
 
 ### Test and configure L7 Policy
 After you've verified that the filter is running, you can configure the policy to check for specific sensitive data types or patterns. For examples of preconfigured and performance tested policies, see [LeakSignal Policies](POLICY.md)
