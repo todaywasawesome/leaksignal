@@ -12,6 +12,7 @@ use anyhow::{bail, Result};
 use fancy_regex::Regex;
 use flate2::write::GzDecoder;
 use futures::{task::waker, Future, FutureExt};
+use leakpolicy::RegexWrapper;
 use log::{error, warn};
 use prost::Message;
 use proxy_wasm::{
@@ -279,12 +280,17 @@ impl HttpResponseContext {
     }
 }
 
-fn extract_token_regex(value: &str, regex: &Regex) -> Option<String> {
-    let captures = regex.captures(value).ok()??;
-    if let Some(captured) = captures.get(1) {
-        Some(captured.as_str().to_string())
-    } else {
-        Some(captures.get(0)?.as_str().to_string())
+fn extract_token_regex(value: &str, regex: Option<&RegexWrapper>) -> Option<String> {
+    match regex {
+        Some(RegexWrapper(regex)) => {
+            let captures = regex.captures(value).ok()??;
+            if let Some(captured) = captures.get(1) {
+                Some(captured.as_str().to_string())
+            } else {
+                Some(captures.get(0)?.as_str().to_string())
+            }
+        }
+        None => Some(value.to_string()),
     }
 }
 

@@ -52,7 +52,7 @@ impl PartialEq for RegexWrapper {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(tag = "action")]
+#[serde(rename_all = "snake_case")]
 pub enum PolicyAction {
     Ignore,
     Alert,
@@ -152,12 +152,6 @@ pub struct ConfiguredPolicyAction {
     /// interpretation is define by the content_type
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub contexts: SingleOrVec<'static, MatchContext>,
-    /// if empty, unlimited count
-    /// if present, `Block` actions (and associated alert) require this many matches
-    /// if present, `Mask` actions (and associated alert) require this many matches (disabled in JSON)
-    /// if present, `Alert` actions will require this many matches to alert
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub match_count: Option<usize>,
     #[serde(default, skip_serializing_if = "AlertConfig::is_empty")]
     pub alert: AlertConfig,
     #[serde(default, skip_serializing_if = "HashSet::is_empty")]
@@ -231,8 +225,8 @@ pub enum Category {
         max_distance: usize,
     },
     Rematch {
-        target: String,
-        rematcher: String,
+        target: MatchGroupRef,
+        rematcher: MatchGroupRef,
     },
     // Jpeg {
     //     /// https://docs.rs/kamadak-exif/0.5.4/src/exif/tag.rs.html#252
@@ -259,7 +253,7 @@ pub struct TokenExtractionConfig {
     pub header: String,
     /// if it has one or more capture groups, the first capture group is returned
     /// otherwise, the entire match is returned
-    pub regex: RegexWrapper,
+    pub regex: Option<RegexWrapper>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]

@@ -8,7 +8,7 @@ pub fn benchmark_fancy_regex(c: &mut Criterion) {
             .unwrap();
     c.bench_function("phone number fancy_regex", |b| {
         b.iter(|| {
-            for x in regex.find_iter(include_str!("../../testing/www/ssn_large.html")) {
+            for x in regex.find_iter(include_str!("../../scripts/local/pub/ssn001.html")) {
                 black_box(x.unwrap());
             }
         })
@@ -21,7 +21,7 @@ pub fn benchmark_regex(c: &mut Criterion) {
             .unwrap();
     c.bench_function("phone number regex", |b| {
         b.iter(|| {
-            for x in regex.find_iter(include_str!("../../testing/www/ssn_large.html")) {
+            for x in regex.find_iter(include_str!("../../scripts/local/pub/ssn001.html")) {
                 black_box(x);
             }
         })

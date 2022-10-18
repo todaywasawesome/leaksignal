@@ -153,7 +153,7 @@ pub fn prepare_matches<'a>(
             prepare_match_group(group2, state, &metadata, extra_ignore);
         }
         Category::Rematch { .. } => {
-            error!("rematch in prepared evaluation");
+            error!("rematch in prepared evaluation not implemented");
         }
     }
 }

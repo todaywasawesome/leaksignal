@@ -36,3 +36,4 @@
 false
 null
 true
+{"😊👪": "\ud83d\ude0a\uD83D\uDC6A"}
