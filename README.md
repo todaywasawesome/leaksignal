@@ -66,8 +66,9 @@ LeakSignal analysis can be setup in the following modes:
 
 If you're looking to kick the tires with a demo setup, you have 2 options:
 1. [Simple Envoy Ingress controller for K8s cluster](https://github.com/leaksignal/testing-environments).
+  * LeakSignal is preinstalled with policy and test applications/services. 
 2. [Google's Online Boutique microservices demo for Istio](https://github.com/leaksignal/testing-environments/istio).
-
+  * Follow along with the Istio install and then add LeaskSignal
   
 ## Getting Started with Existing Setup 
 If you already have an environment up and running (Standalone Envoy, K8s, or Istio) where you'd like to install LeakSignal, use the following quick starts.
@@ -178,8 +179,8 @@ Prometheus is capable of ingesting LeakSignal metrics. You can configure your po
 Here's an example from a [k8s test environment](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
 
 LeakSignal defines 2 new metrics for DevSecOps teams:
-1. Sensitive Data per Minute
-2. Exploits per Minute
+1. Sensitive Data per Minute (SDPM)
+2. Exploits per Minute (EPM)
 
 <img src="assets/grafana-overview.png">
 
