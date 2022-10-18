@@ -1,5 +1,5 @@
 <a href="https://www.leaksignal.com"><p align="center">
-  <img src="assets/logo-black-red.png?sanitize=true" width="800">
+  <img src="assets/logo-black-red.png" width="800">
 </p></a>
 
 <h4 align="center">
@@ -19,7 +19,7 @@ LeakSignal provides observability by generating metrics (or [statistics](https:/
 ### Features
 * Fast, inline Layer 7 request/response analysis.
 * Easy to configure rules ("L7 policy") for detecting and analyzing sensitive data (e.g. PII) leakage.
-  * Detect part numbers, account numbers, patient info, grades, dates, email addresses, large arrays, etc. The available <a href="somewhere">ruleset</a> is constantly evolving.
+  * Detect part numbers, account numbers, patient info, grades, dates, email addresses, large arrays, etc. The available ruleset is constantly evolving.
 * Cloud dashboard with policy editor, monitoring, and alerting.
 * Analysis metrics can be exposed via Envoy and thus reflected wherever Envoy metrics are configured to land (OpenTelemetry, Prometheus, etc.)
 
