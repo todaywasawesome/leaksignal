@@ -199,7 +199,7 @@ The following example data is from our k8s [test environment](https://github.com
 <img src="assets/sd_detail.png" width="750">
 
 Scroll down to the data grid and click on a response ID to examine the alerts that were generated.
-<img src="assets/alert_w_page.png" width="750">
+<img src="assets/alerts_w_page.png" width="750">
 
 
 
