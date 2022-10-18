@@ -1,7 +1,6 @@
-<p align="center">
-  <img src="assets/logo-black-red.png?sanitize=true#gh-light-mode-only" width="800">
-  <img src="assets/logo-black-red.png?sanitize=true#gh-dark-mode-only" width="800">
-</p>
+<a href="https://www.leaksignal.com"><p align="center">
+  <img src="assets/logo-black-red.png?sanitize=true" width="800">
+</p></a>
 
 <h4 align="center">
   <a href="https://www.leaksignal.com">Website</a> |
@@ -21,7 +20,7 @@ LeakSignal provides observability by generating metrics (or [statistics](https:/
 * Fast, inline Layer 7 request/response analysis.
 * Easy to configure rules ("L7 policy") for detecting and analyzing sensitive data (e.g. PII) leakage.
   * Detect part numbers, account numbers, patient info, grades, dates, email addresses, large arrays, etc. The available <a href="somewhere">ruleset</a> is constantly evolving.
-* Cloud dashboard with policy editor, monitoring, and alerting. 
+* Cloud dashboard with policy editor, monitoring, and alerting.
 * Analysis metrics can be exposed via Envoy and thus reflected wherever Envoy metrics are configured to land (OpenTelemetry, Prometheus, etc.)
 
 ### Installation
@@ -60,8 +59,8 @@ Built with Rust and deployed as WebAssembly, LeakSignal natively runs on proxies
 LeakSignal analysis can be setup in the following modes:
 * All metrics and configuration stay local in your environment
 * All metrics and configuration go to LeakSignal COMMAND.
-  * Sensitive data is never stored or transferred to COMMAND. Only metrics describing the analysis along with policy configuration are stored. Feel free to examine this part of the codebase (insert link to line #) where we form the telemetry.
-* (@Issac there might be a better way to word this? ^^^)
+  * Sensitive data is sent to COMMAND by default.
+  * Specific endpoints, match rules, or the entire policy can opt-in to send raw sensitive data, low-bit subsets of SHA-256 hashes for low-entropy data (i.e. credit cards, phone numbers), or no representation of the matched data at all.
 
 ## Getting Started with a Demo
 
@@ -76,17 +75,15 @@ If you already have an environment up and running (Standalone Envoy, K8s, or Ist
 ### Envoy Quickstart
 Docker commands to run an Envoy proxy with LeakSignal installed. 
 
-1. [Register for an account](https://app.leaksignal.com/register), create a deployment and get your API key.
-2. Your API key is located in [@max @rett]
-3. Create a simple barebones deployment by vlicking "Deployments" in the left hand nav and select "Create Deployment"
+1. [Register for an account](https://app.leaksignal.com/register)
+2. Get your API key by clicking "Deployments" in the left hand navigation.
+3. Create a simple barebones deployment by clicking "Create Deployment" on the Deployments page.
 4. Replace YOUR-API-KEY and YOUR-DEPLOYMENT-NAME below with the values in LeakSignal Command.
 
 ```
 FROM envoyproxy/envoy-dev:0b1c5aca39b8c2320501ce4b94fe34f2ad5808aa
-RUN curl -O https://raw.githubusercontent.com/leaksignal/proxy-wasm/main/testing/envoy.yaml
-RUN sed -i 's/api_key_placeholder/YOUR-API-KEY/g' envoy.yaml
-RUN sed -i 's/deployment_name_placeholder/YOUR-DEPLOYMENT-NAME/g' envoy.yaml
-COPY ./envoy.yaml /etc/envoy.yaml
+RUN curl -O https://raw.githubusercontent.com/leaksignal/leaksignal/master/examples/envoy/envoy_command_remote_wasm.yaml > envoy_raw.yaml
+RUN API_KEY="YOUR-API-KEY" DEPLOYMENT_NAME="YOUR-DEPLOYMENT-NAME" envsubst < envoy_raw.yaml > /etc/envoy.yaml
 RUN chmod go+r /etc/envoy.yaml
 CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 ```
@@ -96,13 +93,15 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 
 ### Envoy-Local Quickstart (no cloud connection)
 Docker commands to run an Envoy proxy with LeakSignal installed. This configuration runs LeakSignal in "local" mode where metrics are only exported in the running Envoy instance. Additionally, the LeakSignal L7 Policy is contained in the yaml configuration. LeakSignal API Key and deployment name are not needed.
+
 ```
 FROM envoyproxy/envoy-dev:0b1c5aca39b8c2320501ce4b94fe34f2ad5808aa
-RUN curl -O https://raw.githubusercontent.com/leaksignal/proxy-wasm/main/testing/envoy_standalone.yaml
-COPY ./envoy.yaml /etc/envoy.yaml
+RUN curl -O https://raw.githubusercontent.com/leaksignal/leaksignal/master/examples/envoy/envoy_local.yaml > /etc/envoy.yaml
+RUN curl -O https://ingestion.app.leaksignal.com/s3/leakproxy/2022_10_16_16_18_40_fda6eb2/leakproxy.wasm > /lib/leaksignal.wasm
 RUN chmod go+r /etc/envoy.yaml
 CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 ```
+
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
 > * [View prometheus metrics in grafana](#view-metrics-prometheus-grafana)
@@ -113,9 +112,9 @@ Use the [demo environment](https://github.com/leaksignal/testing-environments) t
 ### Istio
 Install LeakSignal across all Istio sidecar proxies with the following:
 
-1. [Register for an account](https://app.leaksignal.com/register), create a deployment and get your API key.
-2. Your API key is located in [@max @rett]
-3. Create a simple barebones deployment by vlicking "Deployments" in the left hand nav and select "Create Deployment"
+1. [Register for an account](https://app.leaksignal.com/register)
+2. Get your API key by clicking "Deployments" in the left hand navigation.
+3. Create a simple barebones deployment by clicking "Create Deployment" on the Deployments page.
 4. Replace YOUR-API-KEY and YOUR-DEPLOYMENT-NAME below with the values in LeakSignal Command.
 
 ```
@@ -123,23 +122,28 @@ Install LeakSignal across all Istio sidecar proxies with the following:
 istioctl install --set profile=preview
 
 # Apply the following leaksignal.yaml to deploy the filter
+API_KEY="YOUR-API-KEY" \
+DEPLOYMENT_NAME="YOUR-DEPLOYMENT-NAME" \
 curl https://github.com/leaksignal/istio/leaksignal.yaml | \
-‍sed -i 's/api_key_placeholder/YOUR-API-KEY/g' | \
-sed -i 's/deployment_name_placeholder/YOUR-DEPLOYMENT-NAME/g' | kubectl apply -f -
+envsubst | \
+kubectl apply -f -
 
 #restart all the pods
 kubectl delete --all pod
 ```
 > Go to Deployments -> YOUR-DEPLOYMENT-NAME and learn more about the L7 Policy that is currently running.
 
-### Istio-Local (no cloud connection)
+### Istio-Local (no cloud metrics)
 Install LeakSignal across all Istio sidecar proxies with the following. Metrics will be exported in Envoy and L7 Policy is contained in the yaml configuration. LeakSignal API Key and deployment name are not needed.
+
+A connection to the cloud is still necessary to pull the WASM proxy, but no metrics or sensitive data are uploaded.
+
 ```
 #set Istio to preview mode
 istioctl install --set profile=preview
 
 # Apply the following leaksignal.yaml to deploy the filter
-curl https://github.com/leaksignal/istio/leaksignal.yaml | kubectl apply -f -
+curl https://github.com/leaksignal/istio/leaksignal_local.yaml | kubectl apply -f -
 
 #restart all the pods
 kubectl delete --all pod

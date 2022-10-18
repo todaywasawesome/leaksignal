@@ -1,7 +1,6 @@
 
 <a href="https://www.leaksignal.com"><p align="center">
-  <img src="assets/logo-black-red.png?sanitize=true#gh-light-mode-only" width="800">
-  <!--<img src="assets/logo-black-red.png?sanitize=true#gh-dark-mode-only" width="800">-->
+  <img src="assets/logo-black-red.png?sanitize=true" width="800">
 </p></a>
 
 ## LeakSignal Policy

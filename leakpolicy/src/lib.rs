@@ -306,7 +306,7 @@ fn default_global_report_style() -> DataReportStyle {
     DataReportStyle::Raw
 }
 
-fn report_style_is_raw(style: &DataReportStyle) -> bool {
+fn report_style_is_default(style: &DataReportStyle) -> bool {
     *style == DataReportStyle::Raw
 }
 
@@ -331,7 +331,7 @@ pub struct Policy {
     pub collect_matched_values: bool,
     #[serde(
         default = "default_global_report_style",
-        skip_serializing_if = "report_style_is_raw"
+        skip_serializing_if = "report_style_is_default"
     )]
     pub report_style: DataReportStyle,
 }
