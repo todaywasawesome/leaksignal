@@ -124,7 +124,7 @@ istioctl install --set profile=preview
 # Apply the following leaksignal.yaml to deploy the filter
 API_KEY="YOUR-API-KEY" \
 DEPLOYMENT_NAME="YOUR-DEPLOYMENT-NAME" \
-curl https://github.com/leaksignal/istio/leaksignal.yaml | \
+curl https://raw.githubusercontent.com/leaksignal/leaksignal/master/examples/istio/leaksignal.yaml | \
 envsubst | \
 kubectl apply -f -
 
@@ -143,7 +143,7 @@ A connection to the cloud is still necessary to pull the WASM proxy, but no metr
 istioctl install --set profile=preview
 
 # Apply the following leaksignal.yaml to deploy the filter
-curl https://github.com/leaksignal/istio/leaksignal_local.yaml | kubectl apply -f -
+curl https://raw.githubusercontent.com/leaksignal/leaksignal/master/examples/istio/leaksignal_local.yaml | kubectl apply -f -
 
 #restart all the pods
 kubectl delete --all pod
