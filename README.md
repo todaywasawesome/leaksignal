@@ -175,10 +175,13 @@ In all cases you should see messsages with "leaksignal" in the logs. Use those t
 ### View Metrics (Prometheus & Grafana)
 Prometheus is capable of ingesting LeakSignal metrics. You can configure your policy to alert on specific data types to detect spikes in emission of data or edge cases like the signature of a known RCE. (If you don't have or want to use Prometheus skip to the next step)
 
-Here's an example from [our test setup](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
+Here's an example from a [k8s test environment](https://github.com/leaksignal/testing-environments) where grafana displays LeakSignal metrics from prometheus:
 
-<img src="assets/sd_per_min.png" width="300">
-<img src="assets/active_exploits.png" width="350">
+LeakSignal defines 2 new metrics for DevSecOps teams:
+1. Sensitive Data per Minute
+2. Exploits per Minute
+
+<img src="assets/grafana-overview.png">
 
 
 ### View Metrics (COMMAND)
