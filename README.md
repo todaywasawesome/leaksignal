@@ -108,7 +108,7 @@ CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
 
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
-> * [View prometheus metrics in grafana](#view-metrics-prometheus-grafana)
+> * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
 
 Use the [demo environment](https://github.com/leaksignal/testing-environments) to see a working example. Your sensitive data labels and counts will be exported as Envoy metrics. 
 
@@ -157,6 +157,7 @@ kubectl delete --all pod
 ```
 > * [Verify everything is setup correctly](#verify-proper-setup).
 > * Test and configure L7 Policy for your environment
+> * [View prometheus metrics in grafana](#view-metrics-prometheus--grafana)
 
 ### Verify Proper Setup
 After you've installed the LeakSignal filter, you can check the logs to see how things are running:
